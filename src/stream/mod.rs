@@ -338,9 +338,10 @@ impl Stream {
     #[inline]
     async fn get(&self, url: &url::Url, content_length: Option<u64>) -> Result<reqwest::Response> {
         log::trace!("get: {}", url.as_str());
-        let k = self.client.get(url.as_str());
+        
         Ok(if let Some(content_length) = content_length {
-            let k = k.header("Range", format!("bytes=0-{content_length}"));
+            let k = self.client.get(format!("{}?range=0-{}", url.as_str(), content_length));
+            //let k = k.header("Range", format!("bytes=0-{content_length}"));
             k.send().await?.error_for_status()?
         } else {
             self.client
